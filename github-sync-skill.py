@@ -369,6 +369,27 @@ def sync_book_skills(base_path: str, repo_name: str, book_name: str, description
     sha_license = get_sha(repo_name, "LICENSE")
     print(f"    LICENSE: {write_upload_str(repo_name, LICENSE_TEMPLATE, 'LICENSE', sha_license)}")
 
+    # ── Post-sync required-file guard (fail-fast) ──
+    # 缺失这些文件中的任何一个 → 脚本以非零退出码终止
+    required_files = {
+        "README.md":           "根目录说明（从 INDEX.md 自动生成，book-class 必填）",
+        "SKILL.md":            "meta入口文件",
+        "_meta.json":          "版本与 skill 清单",
+        "references/INDEX.md": "技能索引",
+    }
+    missing = []
+    for path, desc in required_files.items():
+        if not get_sha(repo_name, path):
+            missing.append(f"{path} ({desc})")
+    if missing:
+        print(f"\n\n❌ POST-SYNC CHECK FAILED — missing required files:")
+        for m in missing:
+            print(f"   • {m}")
+        print(f"\nSync incomplete. Fix and re-run. "
+              f"(Hint: For book-class repos, ensure INDEX.md exists at the source path.)")
+        sys.exit(1)
+    print(f"\n✅ Post-sync check passed ({len(required_files)}/{len(required_files)} files)")
+
     print(f"\n✅ {repo_name} sync complete ({len(skill_dirs)} skills)")
 
 # ============================================================
