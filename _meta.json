@@ -1,7 +1,7 @@
 {
   "name": "github-sync-skill",
-  "version": "v1.0.3",
-  "description": "Denny Skill 仓库强制分类同步脚本（v1.0.3: 新增 versions/ 快照缺失时 advisory 提示；v1.0.2: post-sync fail-fast guard）",
+  "version": "v1.0.4",
+  "description": "Denny Skill 仓库强制分类同步脚本（v1.0.4: versions/ 升级为 fail-fast；v1.0.3: advisory check）",
   "maintained_by": "Denny @ smash-Denny",
   "tools": [
     "github-sync-skill.py"
