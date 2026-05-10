@@ -44,7 +44,8 @@ https://github.com/smash-Denny/github-sync-skill
 | 版本 | 核心变化 |
 |------|----------|
 | **v1.0.2** | 新增 post-sync required-file guard（fail-fast）；book-class 自动生成 README.md |
-| **v1.0.1** | 修复 book-class repo 缺少 README.md 的遗漏 |
+
+| **v1.0.3** | 新增 versions/ 快照缺失 advisory 检查 || **v1.0.1** | 修复 book-class repo 缺少 README.md 的遗漏 |
 | **v1.0.0** | 初始版本，支持书籍拆解类与独立工具类自动识别 |
 
 ---
