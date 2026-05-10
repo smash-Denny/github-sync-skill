@@ -47,6 +47,7 @@ https://github.com/smash-Denny/github-sync-skill
 
 | **v1.0.3** | 新增 versions/ 快照缺失 advisory 检查 || **v1.0.1** | 修复 book-class repo 缺少 README.md 的遗漏 |
 | **v1.0.0** | 初始版本，支持书籍拆解类与独立工具类自动识别 |
+| **[v1.0.5](#105)** | fix: step13违规检测升级为fatal(必阻止)；README版本历史补全v1.0.4 |
 
 ---
 
