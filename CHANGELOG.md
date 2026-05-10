@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.0.3
+
+- feat: 新增 versions/ 快照缺失 advisory 检查（post-sync 时提示，提示而非阻断）
+- 注意：v1.0.1 和 v1.0.2 的 versions/ 快照已补全
+
 ## v1.0.2
 
 - feat: post-sync required-file guard（上传后完整性检查，缺失 README.md / SKILL.md / _meta.json / references/INDEX.md 任一文件时 fail-fast 退出，exit 1）
