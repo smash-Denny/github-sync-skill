@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.0.6
+
+- feat(skill-bump): 修复README版本历史顺序bug（改append为prepend到顶部）；修复step13违规时输出顺序
+- 注意：v1.0.5版本历史已完整修复
+
 ## v1.0.5（2026-05-11）
 
 fix: step13违规检测升级为fatal(必阻止)；README版本历史补全v1.0.4
