@@ -307,6 +307,19 @@ def sync_book_skills(base_path: str, repo_name: str, book_name: str, description
         else:
             print(f"    {name}: ⚠️  源文件不存在，跳过")
 
+    # ── README.md（book-class 专用：复制 INDEX.md 作为根目录 README）──
+    # 约定：INDEX.md 格式兼容 README 展示场景，同时作为 GitHub repo 首页说明
+    readme_src = base / "INDEX.md"
+    if readme_src.exists():
+        sha_readme = get_sha(repo_name, "README.md")
+        with open(readme_src, "r", encoding="utf-8") as f:
+            readme_content = f.read()
+        print(f"\n  [root README]")
+        print(f"    README.md (from INDEX.md): {write_upload_str(repo_name, readme_content, 'README.md', sha_readme)}")
+    else:
+        print(f"\n  [root README]")
+        print(f"    README.md: ⚠️  INDEX.md 不存在，无法生成 README（book-class repo 应有 INDEX.md）")
+
     # ── skills/（各 skill SKILL.md + test-prompts）──
     print(f"\n  [skills/]")
     for skill_folder in sorted(skill_dirs):
