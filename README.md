@@ -30,3 +30,9 @@ python3 github-sync-skill.py --archive-patterns Denny-48laws,Denny-WTFA --archiv
 ## GitHub
 
 https://github.com/smash-Denny/github-sync-skill
+
+---
+
+## Book-class Support
+
+**Important (v1.0.1+)**: Book-class repos (those with `BOOK_OVERVIEW.md`) now automatically get a `README.md` generated from `INDEX.md` during sync. No manual README creation needed.
