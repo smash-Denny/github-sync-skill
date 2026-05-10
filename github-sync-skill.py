@@ -390,6 +390,23 @@ def sync_book_skills(base_path: str, repo_name: str, book_name: str, description
         sys.exit(1)
     print(f"\n✅ Post-sync check passed ({len(required_files)}/{len(required_files)} files)")
 
+    # ── versions/ snapshot check ──
+    # versions/ 快照由 skill-bump 管理；若发现当前版本快照缺失，提示但不阻断
+    # （工具类 repo 如 github-sync-skill 本身不在 versions/ 管理范围内，这里仅提示）
+    # 若 repo 有 versions/ 目录且配置了 _meta.json 中的 version，则检查快照是否存在
+    if (base / "_meta.json").exists():
+        try:
+            import json as _json
+            with open(base / "_meta.json") as _f:
+                _meta = _json.load(_f)
+            _ver = _meta.get("version", "").lstrip("v")
+            if _ver and (base / "versions" / f"v{_ver}.md").exists():
+                _sha_v = get_sha(repo_name, f"versions/v{_ver}.md")
+                if not _sha_v:
+                    print(f"\n⚠️  versions/v{_ver}.md missing — run skill-bump to snapshot this version")
+        except Exception:
+            pass  # versions/ check is advisory only, never blocks sync
+
     print(f"\n✅ {repo_name} sync complete ({len(skill_dirs)} skills)")
 
 # ============================================================
