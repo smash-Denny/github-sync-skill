@@ -1,0 +1,9 @@
+{
+  "name": "github-sync-skill",
+  "version": "v1.0.0",
+  "description": "Denny Skill 仓库强制分类同步脚本",
+  "maintained_by": "Denny @ smash-Denny",
+  "tools": [
+    "github-sync-skill.py"
+  ]
+}
