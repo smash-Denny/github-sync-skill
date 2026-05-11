@@ -43,6 +43,7 @@ https://github.com/smash-Denny/github-sync-skill
 
 | 版本 | 核心变化 |
 |------|----------|
+| **[v1.0.7](#107)** | 新增Phase4跨文件版本一致性验证（四文件同步检测） |
 | **v1.0.6** | 修复bump脚本未更新README版本历史的遗漏；新增step13跨文件一致性验证 |
 | **v1.0.5** | step13违规升级为fatal必阻止；修复README版本历史顺序bug |
 | **v1.0.4** | versions/升级为fail-fast；README修复版本历史重复问题 |
