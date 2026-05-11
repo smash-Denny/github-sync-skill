@@ -301,7 +301,16 @@ def sync_book_skills(base_path: str, repo_name: str, book_name: str, description
         skill_dirs.append(name)
 
     if not skill_dirs:
-        print(f"ERROR: 未找到任何 skill 子目录（{skills_base}/下应有 skill-name/SKILL.md）")
+        print(f"ERROR: 未找到任何 skill 子目录")
+        print(f"  扫描路径: {skills_base}")
+        print(f"  正确结构: BASE/skills/{{skill-name}}/SKILL.md")
+        if not skills_base.exists():
+            print(f"  → skills/ 目录不存在，请确认路径是否正确")
+            print(f"  → 如果在本地工作区，路径应该是: books/{{book-name}}/skills/")
+        else:
+            print(f"  → skills/ 存在但没有子目录包含 SKILL.md")
+            print(f"  → 每个 skill 需要: skills/{{skill-name}}/SKILL.md")
+            print(f"  → 运行 --validate 诊断: python3 github-sync-skill.py --validate <path>")
         sys.exit(1)
 
     print(f"  发现 {len(skill_dirs)} 个 skills: {', '.join(skill_dirs)}")
@@ -428,6 +437,90 @@ def sync_book_skills(base_path: str, repo_name: str, book_name: str, description
 # ============================================================
 # 主入口
 # ============================================================
+# 结构验证（不走上传，诊断问题）
+# ============================================================
+
+def validate_book_structure(base_path: str):
+    """诊断 book-class 目录结构，不上传任何内容。"""
+    base = Path(base_path)
+    print(f"=== Denny-book 结构验证 ===")
+    print(f"路径: {base_path}")
+    print()
+
+    errors = []
+    warnings = []
+
+    # 1. skills/ 目录
+    skills_base = base / "skills"
+    if not skills_base.is_dir():
+        errors.append(f"skills/ 目录不存在：{skills_base}")
+        errors.append(f"  → 正确结构: {base}/skills/{{skill-name}}/SKILL.md")
+        skills_found = []
+    else:
+        print(f"[OK] skills/ 目录存在: {skills_base}")
+        skills_found = []
+        for item in sorted(skills_base.iterdir()):
+            if not item.is_dir():
+                continue
+            if "{" in item.name or "}" in item.name:
+                warnings.append(f"跳过异常目录名: {item.name}")
+                continue
+            skill_md = item / "SKILL.md"
+            if skill_md.exists():
+                skills_found.append(item.name)
+            else:
+                warnings.append(f"skills/{item.name}/ 存在但无 SKILL.md")
+
+    # 2. references/ 文件
+    ref_files = {
+        "BOOK_OVERVIEW.md": base / "BOOK_OVERVIEW.md",
+        "INDEX.md": base / "INDEX.md",
+    }
+    for fname, fpath in ref_files.items():
+        if fpath.exists():
+            print(f"[OK] {fname} 存在")
+        else:
+            warnings.append(f"{fname} 不存在（推荐但非必须）")
+
+    # 3. candidates/ 和 rejected/（可选）
+    for d in ["candidates", "rejected"]:
+        dp = base / d
+        if dp.exists():
+            count = len(list(dp.iterdir()))
+            print(f"[OK] {d}/ 存在 ({count} files)")
+
+    print()
+    if skills_found:
+        print(f"[OK] 找到 {len(skills_found)} 个 skills:")
+        for s in skills_found:
+            print(f"     - {s}")
+    else:
+        if skills_base.is_dir():
+            errors.append("skills/ 目录存在但没有找到任何 skill 子目录")
+            errors.append("  → 每个 skill 目录必须包含 SKILL.md")
+
+    print()
+    if warnings:
+        print(f"⚠️  警告 ({len(warnings)}):")
+        for w in warnings:
+            print(f"   {w}")
+        print()
+
+    if errors:
+        print(f"❌ 错误 ({len(errors)}):")
+        for e in errors:
+            print(f"   {e}")
+        print()
+        print("修复建议：")
+        if not skills_base.is_dir():
+            print(f"  mkdir -p {base}/skills/{{skill-name}}/SKILL.md")
+        if skills_found:
+            print(f"  确认每个 skill 目录都在 skills/ 下: {skills_base}/")
+        return 1
+    else:
+        print(f"✅ 结构验证通过")
+        return 0
+
 
 def main():
     if len(sys.argv) < 2:
@@ -438,6 +531,9 @@ def main():
         print("")
         print("  # 独立工具类")
         print("  python3 github-sync-skill.py ~/workspace/skills/Denny-taotie --repo-name Denny-taotie")
+        print("")
+        print("  # 验证本地目录结构（不上传）")
+        print("  python3 github-sync-skill.py --validate ~/workspace/books/48-laws-of-power")
         print("")
         print("  # 归档旧repo")
         print("  python3 github-sync-skill.py --archive-patterns Denny-48laws,Denny-WTFA --archive-note 'Merged'")
@@ -451,6 +547,17 @@ def main():
         if patterns:
             archive_patterns(patterns, note)
         sys.exit(0)
+
+    # ── 验证模式 ──
+    if sys.argv[1] == "--validate":
+        if len(sys.argv) < 3:
+            print("用法: github-sync-skill.py --validate <book-path>")
+            sys.exit(1)
+        base_path = sys.argv[2]
+        if not os.path.exists(base_path):
+            print(f"ERROR: 路径不存在: {base_path}")
+            sys.exit(1)
+        sys.exit(validate_book_structure(base_path))
 
     base_path = sys.argv[1]
     if not os.path.exists(base_path):
