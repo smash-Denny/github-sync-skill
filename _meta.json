@@ -1,6 +1,6 @@
 {
   "name": "github-sync-skill",
-  "version": "v1.0.7",
+  "version": "v1.0.8",
   "description": "Denny Skill仓库强制分类同步脚本（v1.0.6: 修复README版本历史顺序bug；v1.0.5: step13违规升级为fatal必阻止）",
   "maintained_by": "Denny @ smash-Denny",
   "tools": [
