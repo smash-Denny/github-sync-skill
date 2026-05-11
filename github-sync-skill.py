@@ -1370,6 +1370,33 @@ def step13_sync_checker(repo_path):
                                     f"{direction}，首条={readme_first_ver}，末条应为最新={expected_ver}"))
 
 
+    # ── Phase 4: 跨文件版本一致性验证 ──
+    log("  📋 Phase 4: 跨文件版本一致性（_meta.json × CHANGELOG × README × versions/）")
+
+    # 收集各文件的"最新版本"标识
+    version_sources = {}
+    version_sources["_meta.json"] = meta_ver
+    version_sources["versions/"] = f"v{meta_ver}.md"
+
+    # CHANGELOG 最新 section 版本
+    cl_match = re.search(r'^##\s+v?(\d+\.\d+\.\d+)', cl_text, re.MULTILINE)
+    if cl_match:
+        version_sources["CHANGELOG最新section"] = cl_match.group(1)
+
+    # README 版本历史第一条
+    if readme_first_ver:
+        version_sources["README历史首条"] = readme_first_ver
+
+    # 检查是否全部一致
+    unique_vers = set(version_sources.values())
+    if len(unique_vers) == 1:
+        checks.append(("版本一致性（四文件）", True,
+                        f"_meta={meta_ver}，CHANGELOG={list(version_sources.values())[0]}，README首条={readme_first_ver}，versions/=v{meta_ver}.md ✓"))
+    else:
+        mismatched = {k: v for k, v in version_sources.items() if v != meta_ver}
+        checks.append(("版本一致性（四文件）", False,
+                        f"不一致: {mismatched}"))
+
     # ── 输出结果 ──
     log("")
     failed = [(n, d) for n, ok, d in checks if not ok]
